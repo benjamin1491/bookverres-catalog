@@ -25,10 +25,19 @@ jobs:
       - name: Installer les dépendances
         run: pip install -r requirements.txt
 
+      - name: Lister les fichiers sources
+        run: ls -lh sources/
+
       - name: Générer le catalogue JSON
         env:
           BOOKVERRES_SOURCE_DIR: sources
         run: python convert_to_json.py
+
+      - name: Afficher le rapport en cas d'erreur
+        if: failure()
+        run: |
+          echo "=== generation_report.json ==="
+          cat generation_report.json | python3 -c "import sys,json; r=json.load(sys.stdin); print('ERREURS:'); [print(' -',e) for e in r.get('errors',[])]"
 
       - name: Préparer le fichier final
         run: |
