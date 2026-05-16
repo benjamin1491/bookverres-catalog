@@ -1,0 +1,47 @@
+name: Générer le catalogue verres
+
+on:
+  push:
+    paths:
+      - 'sources/**'
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Récupérer les fichiers
+        uses: actions/checkout@v4
+
+      - name: Installer Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Installer les dépendances
+        run: pip install -r requirements.txt
+
+      - name: Générer le catalogue JSON
+        env:
+          BOOKVERRES_SOURCE_DIR: sources
+        run: python convert_to_json.py
+
+      - name: Préparer le fichier final
+        run: |
+          CANDIDATE=$(ls catalogs/candidates/verres_complet_candidate_*.json | sort | tail -1)
+          cp "$CANDIDATE" verres_complet.json
+          echo "Fichier généré : $CANDIDATE"
+          ls -lh verres_complet.json
+
+      - name: Publier sur GitHub Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: catalog-${{ github.run_number }}
+          name: "Catalogue #${{ github.run_number }}"
+          files: verres_complet.json
+          make_latest: true
+          token: ${{ secrets.GITHUB_TOKEN }}
