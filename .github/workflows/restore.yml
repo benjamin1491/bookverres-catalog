@@ -1,0 +1,42 @@
+name: Restaurer une version précédente
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_number:
+        description: "Numéro de la génération à restaurer (ex: 4)"
+        required: true
+        type: string
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Récupérer la branche output
+        uses: actions/checkout@v4
+        with:
+          ref: output
+          fetch-depth: 0
+
+      - name: Rechercher et restaurer la version demandée
+        run: |
+          TARGET="Catalogue #${{ github.event.inputs.run_number }}"
+          COMMIT=$(git log --oneline | grep "$TARGET" | head -1 | awk '{print $1}')
+
+          if [ -z "$COMMIT" ]; then
+            echo "❌ Version '$TARGET' introuvable."
+            echo "Versions disponibles :"
+            git log --oneline
+            exit 1
+          fi
+
+          echo "✅ Restauration de : $TARGET ($COMMIT)"
+          git checkout "$COMMIT" -- verres_complet.json
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "Restauration $TARGET (rollback depuis #${{ github.run_number }})"
+          git push origin output
