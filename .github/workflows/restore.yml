@@ -23,7 +23,7 @@ jobs:
 
       - name: Rechercher et restaurer la version demandée
         run: |
-          TARGET="Catalogue #${{ github.event.inputs.run_number }}"
+          TARGET="#${{ github.event.inputs.run_number }}"
           COMMIT=$(git log --oneline | grep "$TARGET" | head -1 | awk '{print $1}')
 
           if [ -z "$COMMIT" ]; then
