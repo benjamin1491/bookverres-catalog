@@ -3,8 +3,8 @@ name: Restaurer une version précédente
 on:
   workflow_dispatch:
     inputs:
-      run_number:
-        description: "Numéro de la génération à restaurer (ex: 4)"
+      date:
+        description: "Date de la version à restaurer (format jj/mm/aa, ex: 15/05/26)"
         required: true
         type: string
 
@@ -23,20 +23,21 @@ jobs:
 
       - name: Rechercher et restaurer la version demandée
         run: |
-          TARGET="#${{ github.event.inputs.run_number }}"
+          TARGET="${{ github.event.inputs.date }}"
           COMMIT=$(git log --oneline | grep "$TARGET" | head -1 | awk '{print $1}')
 
           if [ -z "$COMMIT" ]; then
-            echo "❌ Version '$TARGET' introuvable."
+            echo "❌ Aucune version trouvée pour la date '$TARGET'."
+            echo ""
             echo "Versions disponibles :"
             git log --oneline
             exit 1
           fi
 
-          echo "✅ Restauration de : $TARGET ($COMMIT)"
+          echo "✅ Restauration de la version du $TARGET ($COMMIT)"
           git checkout "$COMMIT" -- verres_complet.json
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git commit -m "Restauration $TARGET (rollback depuis #${{ github.run_number }})"
+          git commit -m "Restauration du $TARGET (rollback #${{ github.run_number }})"
           git push origin output
