@@ -316,11 +316,11 @@ def find_pao_file(report):
         path for path in WORKING_DIR.iterdir()
         if path.is_file()
         and path.suffix.lower() in ('.xlsx', '.xls')
-        and 'pao_sei' in path.name.lower()
+        and ('pao_sei' in path.name.lower() or 'paoseiko' in path.name.lower() or 'pao_seiko' in path.name.lower())
         and not path.name.startswith('~$')
     ]
     if not matches:
-        fail(report, 'Aucun fichier PAO_SEI .xlsx/.xls trouvé.')
+        fail(report, 'Aucun fichier PAO_SEI / PAOSEIKO .xlsx/.xls trouvé.')
     if len(matches) > 1:
         fail(report, f'Plusieurs fichiers PAO_SEI détectés: {[p.name for p in matches]}')
 
