@@ -51,9 +51,11 @@ jobs:
           cp verres_complet.json /tmp/verres_complet.json
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout --orphan output-tmp
-          git rm -rf . --quiet
+          # Récupérer la branche output existante ou la créer
+          git fetch origin output:output 2>/dev/null || git checkout --orphan output-init
+          git checkout output 2>/dev/null || git checkout --orphan output
+          git rm -rf . --quiet 2>/dev/null || true
           cp /tmp/verres_complet.json verres_complet.json
           git add verres_complet.json
-          git commit -m "Catalogue généré #${{ github.run_number }}"
-          git push origin HEAD:output --force
+          git commit -m "Catalogue #${{ github.run_number }} — $(date '+%Y-%m-%d %H:%M')"
+          git push origin output
