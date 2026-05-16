@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       date:
-        description: "Date de la version à restaurer (format jj/mm/aa, ex: 15/05/26)"
+        description: "Date et heure de la version à restaurer (ex: 15/05/26 14:30)"
         required: true
         type: string
 
@@ -39,5 +39,5 @@ jobs:
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git commit -m "Restauration du $TARGET (rollback #${{ github.run_number }})"
+          git commit -m "Restauration du $TARGET — rollback #${{ github.run_number }}"
           git push origin output

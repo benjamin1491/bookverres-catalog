@@ -57,5 +57,5 @@ jobs:
           git rm -rf . --quiet 2>/dev/null || true
           cp /tmp/verres_complet.json verres_complet.json
           git add verres_complet.json
-          git commit -m "Catalogue du $(date '+%d/%m/%y') #${{ github.run_number }}"
+          git commit -m "Catalogue du $(date '+%d/%m/%y %H:%M') #${{ github.run_number }}"
           git push origin output
