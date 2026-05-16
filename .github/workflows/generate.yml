@@ -46,11 +46,14 @@ jobs:
           echo "Fichier généré : $CANDIDATE"
           ls -lh verres_complet.json
 
-      - name: Publier sur GitHub Releases
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: catalog-${{ github.run_number }}
-          name: "Catalogue #${{ github.run_number }}"
-          files: verres_complet.json
-          make_latest: true
-          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publier dans la branche output
+        run: |
+          cp verres_complet.json /tmp/verres_complet.json
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan output-tmp
+          git rm -rf . --quiet
+          cp /tmp/verres_complet.json verres_complet.json
+          git add verres_complet.json
+          git commit -m "Catalogue généré #${{ github.run_number }}"
+          git push origin HEAD:output --force
