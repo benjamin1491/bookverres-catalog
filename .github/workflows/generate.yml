@@ -15,6 +15,8 @@ jobs:
     steps:
       - name: Récupérer les fichiers
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Installer Python 3.11
         uses: actions/setup-python@v5
@@ -51,11 +53,17 @@ jobs:
           cp verres_complet.json /tmp/verres_complet.json
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          # Récupérer la branche output existante ou la créer
-          git fetch origin output:output 2>/dev/null || git checkout --orphan output-init
-          git checkout output 2>/dev/null || git checkout --orphan output
-          git rm -rf . --quiet 2>/dev/null || true
+
+          git fetch origin output || true
+
+          if git show-ref --verify --quiet refs/remotes/origin/output; then
+            git checkout -B output origin/output
+          else
+            git checkout --orphan output
+            git rm -rf . --quiet 2>/dev/null || true
+          fi
+
           cp /tmp/verres_complet.json verres_complet.json
           git add verres_complet.json
-          git commit -m "Catalogue du $(date '+%d/%m/%y %H:%M') #${{ github.run_number }}"
-          git push origin output
+          git commit -m "Catalogue du $(date '+%d/%m/%y %H:%M') #${{ github.run_number }}" || echo "Rien à committer"
+          git push origin HEAD:output
