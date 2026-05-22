@@ -54,15 +54,20 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+          # Nettoyer les fichiers générés non suivis avant de changer de branche
+          git reset --hard
+          git clean -fdx
+
           git fetch origin output || true
 
           if git show-ref --verify --quiet refs/remotes/origin/output; then
             git checkout -B output origin/output
           else
             git checkout --orphan output
-            git rm -rf . --quiet 2>/dev/null || true
           fi
 
+          # La branche output doit contenir uniquement le JSON final
+          git rm -rf . --quiet 2>/dev/null || true
           cp /tmp/verres_complet.json verres_complet.json
           git add verres_complet.json
           git commit -m "Catalogue du $(date '+%d/%m/%y %H:%M') #${{ github.run_number }}" || echo "Rien à committer"
