@@ -4,6 +4,8 @@ on:
   push:
     paths:
       - 'sources/**'
+      - 'convert_to_json.py'
+      - '.github/workflows/generate.yml'
   workflow_dispatch:
 
 jobs:
