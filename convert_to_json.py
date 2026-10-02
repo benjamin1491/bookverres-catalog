@@ -989,7 +989,7 @@ def validate_final_output(report, products_list):
 def write_success_outputs(report, products_list):
     output_json = Path(report['files']['output_json'])
     with output_json.open('w', encoding='utf-8') as f:
-        json.dump(products_list, f, ensure_ascii=False, indent=2, allow_nan=False)
+        json.dump(products_list, f, ensure_ascii=False, separators=(',', ':'), allow_nan=False)
     report['sha256'] = hashlib.sha256(output_json.read_bytes()).hexdigest()
     report['status'] = 'success'
     write_report(report)
